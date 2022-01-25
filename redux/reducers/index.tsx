@@ -1,8 +1,8 @@
 import {combineReducers} from 'redux'
 import { productReducer } from './productReducer'
 
- const reducers = combineReducers({
+export const reducers = combineReducers({
     allProducts:productReducer
 })
 
-export default reducers
+export type RootState = ReturnType<typeof reducers>

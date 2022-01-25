@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { useSelector, useStore } from "react-redux";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/reducers";
 import ProductCard from "./productCard";
 
 const ProductComponent = () => {
 
   // const store = useStore().getState() ==> getting values from store
-  const products = useSelector((state) => state.allProducts.products);
-  const totalProductsCount = products.reduce((previousProductsCount) => previousProductsCount + 1 ,0);
-  const totalProductsPrice = products.reduce((previousProductsPrice, currentProductPrice) =>previousProductsPrice + currentProductPrice.price,0);
+  // const products1 = useSelector((state:RootStateOrAny) => state.allProducts.products);
+  const products = useSelector((state: RootState) => state.allProducts.products);
+  const totalProductsCount = products.reduce((previousProductsCount: number) => previousProductsCount + 1 ,0);
+  const totalProductsPrice = products.reduce((previousProductsPrice: number, currentProductPrice: { price: number; }) =>previousProductsPrice + currentProductPrice.price,0);
   const [categoryProducts, setCategoryProducts] = useState(products);
   const [filteredProductsCount, setFilteredProductsCount] = useState(totalProductsCount);
   const [filteredProductsPrice, setfilteredProductsPrice] = useState(totalProductsPrice);
   const productsByCategoryMap = new Map();
-  const categoryList = [];
+  const categoryList: any[] = [];
 
   products.forEach((prod: { category: any }) => {
     if (!categoryList.includes(prod.category)) {
@@ -31,8 +33,8 @@ const ProductComponent = () => {
     const updateByCategory = (categoryName: string) => {
     const FilterByCategory =productsByCategoryMap.get(categoryName);
     // const FilterByCategory = products.filter((prod: { category: string }) => prod.category == category);
-    const totalCountByCategory = products.reduce((previousVal, product) => product.category === categoryName ? previousVal + 1 : previousVal,0);
-    const totalPriceByCategory = FilterByCategory.reduce((previousProductPrice, currentProductPrice) =>previousProductPrice + currentProductPrice.price,0);
+    const totalCountByCategory = products.reduce((previousVal: number, product: { category: string; }) => product.category === categoryName ? previousVal + 1 : previousVal,0);
+    const totalPriceByCategory = FilterByCategory.reduce((previousProductPrice: number, currentProductPrice: { price: number; }) =>previousProductPrice + currentProductPrice.price,0);
 
     setCategoryProducts(FilterByCategory);
     setFilteredProductsCount(totalCountByCategory);
