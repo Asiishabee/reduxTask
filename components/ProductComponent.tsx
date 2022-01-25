@@ -1,105 +1,80 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useStore } from "react-redux";
+import ProductCard from "./productCard";
 
 const ProductComponent = () => {
-  const products = useSelector((state) => state.allProducts.products);
-  const calculateAllPrice=  (items) => items.reduce((acc: any, curr: { price: any; }) =>
-  acc + curr.price , 0);
-  const initialPrice = calculateAllPrice(products)
-  console.log(initialPrice);
- 
- 
-  const [category, setCategory] = useState(products);
-  const [filteredCount, setFilteredCount] = useState(10)
-  const [filteredPrice, setfilteredPrice] = useState(initialPrice)
-  const productsByCategoryMap = new Map();
 
-  var categorryList: any[] = [];
-  products.forEach((prod: { category: any; }) => {
-    if (!categorryList.includes(prod.category)) {
-      categorryList.push(prod.category);
+  // const store = useStore().getState() ==> getting values from store
+  const products = useSelector((state) => state.allProducts.products);
+  const totalProductsCount = products.reduce((previousProductsCount) => previousProductsCount + 1 ,0);
+  const totalProductsPrice = products.reduce((previousProductsPrice, currentProductPrice) =>previousProductsPrice + currentProductPrice.price,0);
+  const [categoryProducts, setCategoryProducts] = useState(products);
+  const [filteredProductsCount, setFilteredProductsCount] = useState(totalProductsCount);
+  const [filteredProductsPrice, setfilteredProductsPrice] = useState(totalProductsPrice);
+  const productsByCategoryMap = new Map();
+  const categoryList = [];
+
+  products.forEach((prod: { category: any }) => {
+    if (!categoryList.includes(prod.category)) {
+      categoryList.push(prod.category);
     }
   });
 
-  categorryList.forEach((category) => {
+  categoryList.forEach((category) => {
     productsByCategoryMap.set(
       category,
-      products.filter((prod: { category: string }) => prod.category == category)
+      products.filter((prod: { category: string }) => prod.category === category)
     );
   });
 
-  
-  function updateByCategory(category:string) {
-  
+ 
+    const updateByCategory = (categoryName: string) => {
+    const FilterByCategory =productsByCategoryMap.get(categoryName);
+    // const FilterByCategory = products.filter((prod: { category: string }) => prod.category == category);
+    const totalCountByCategory = products.reduce((previousVal, product) => product.category === categoryName ? previousVal + 1 : previousVal,0);
+    const totalPriceByCategory = FilterByCategory.reduce((previousProductPrice, currentProductPrice) =>previousProductPrice + currentProductPrice.price,0);
 
-    const FilterByCategory  =  products.filter((prod: { category: string }) => prod.category == category)
-
-    const totalFilteredProduct = products.reduce((previousVal: number, product: { category: string; }) =>  product.category == category? previousVal+1 : previousVal, 0);
-    const totalFilteredPrice=  (items: any[]) => items.reduce((acc: any, curr: { price: any; }) =>
-    acc + curr.price , 0);
-
-
-
-
-
-    setCategory(FilterByCategory)
-    setFilteredCount(totalFilteredProduct)
-    setfilteredPrice(totalFilteredPrice(FilterByCategory))
-    
+    setCategoryProducts(FilterByCategory);
+    setFilteredProductsCount(totalCountByCategory);
+    setfilteredProductsPrice(totalPriceByCategory);
   }
 
   const reset = () => {
     // reset values
-    setCategory(products);
-    setfilteredPrice(initialPrice);
-    setFilteredCount(10)
-    
+    setCategoryProducts(products);
+    setfilteredProductsPrice(totalProductsPrice);
+    setFilteredProductsCount(totalProductsCount);
   };
 
-
   return (
-      <>
-
-<div className="">
-<button   className="bg-red-200 m-2 p-4" onClick={reset}>All</button>
-      {categorryList.map((cat, index) => {
-        return (
-          <button  id={index}
-            className="bg-red-200 m-2 p-4"
-            onClick={() => updateByCategory(cat)} 
-          >
-            {cat}
-          </button>
-        );
-      })}
-
-    
-</div>
-     
-    <div>Total count - {filteredCount}</div>
-    <div>Total Cost is - Rs:{filteredPrice}</div>
-       
-      <div className="flex flex-wrap justify-center">{category.map((cat: { image: string | undefined; title: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined; price: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined; }) =>{
-
-          return(
-              <>
-            
-              <div className="w-80 h-80 m-4 bg-gray-100">
-              <img src={cat.image} alt="" className="p-4 h-3/5 w-full"/>
-              <h1 className="p-4">{cat.title}</h1>
-              <p className="p-4">Rs: {cat.price}</p>
-              </div>
-            
-              </>
-          ) 
-      })}</div>
-   
-      </>
-      
-  
+    <>
+      <div className="">
+        <button className="bg-red-200 m-2 p-4" onClick={reset}>
+          All
+        </button>
+        {categoryList.map((categoryName) => {
+          return (
+            <button className="bg-red-200 m-2 p-4" onClick={() => updateByCategory(categoryName)}>{categoryName} </button>
+          );
+        })}
+      </div>
+      <div>Total count - {filteredProductsCount}</div>
+      <div>Total Cost is - Rs:{filteredProductsPrice}</div>
+      <div className="flex flex-wrap justify-center">
+      {categoryProducts.map((cat: {image: string;title:string; price:string}) => {
+            return (
+              <ProductCard category = {cat}/>
+            );
+          }
+      )}
+      </div>
+    </>
   );
 
-  
+
+
+
+
 };
 
 export default ProductComponent;
