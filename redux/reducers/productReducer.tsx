@@ -2,17 +2,21 @@ import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
   products: [{
-    title:"asisa",
-    price: "60",
-    image:"https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
+    title:"aisa",
+    price:"100",
+    
   }]
  
 };
 
 export const productReducer = (state= initialState, { type, payload }) => {
   switch (type) {
+    case ActionTypes.FETCH_PRODUCTS:
+      return {...state, products:payload};
+
     case ActionTypes.SET_PRODUCTS:
       return {...state, products:payload};
+
     default:
       return state;
   }

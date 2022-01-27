@@ -9,7 +9,7 @@ const ProductComponent = () => {
   // const products1 = useSelector((state:RootStateOrAny) => state.allProducts.products);
   const products = useSelector((state: RootState) => state.allProducts.products);
   const totalProductsCount = products.reduce((previousProductsCount: number) => previousProductsCount + 1 ,0);
-  const totalProductsPrice = products.reduce((previousProductsPrice: number, currentProductPrice: { price: number; }) =>previousProductsPrice + currentProductPrice.price,0);
+  const totalProductsPrice = products.reduce((previousProductsPrice: number, currentProductPrice: { price: number; }) =>previousProductsPrice + currentProductPrice.price,1);
   const [categoryProducts, setCategoryProducts] = useState(products);
   const [filteredProductsCount, setFilteredProductsCount] = useState(totalProductsCount);
   const [filteredProductsPrice, setfilteredProductsPrice] = useState(totalProductsPrice);
