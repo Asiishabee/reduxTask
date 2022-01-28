@@ -4,4 +4,3 @@ export default axios.create({
     baseURL: "https://fakestoreapi.com",
 })
 
-console.log("helloooo");

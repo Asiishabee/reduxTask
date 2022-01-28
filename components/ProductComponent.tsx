@@ -1,82 +1,89 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/reducers";
+import { RootStateOrAny, useSelector } from "react-redux";
+import { Category } from "../models/Category";
+import { Product } from "../models/product";
 import ProductCard from "./productCard";
 
 const ProductComponent = () => {
 
   // const store = useStore().getState() ==> getting values from store
-  // const products1 = useSelector((state:RootStateOrAny) => state.allProducts.products);
-  const products = useSelector((state: RootState) => state.allProducts.products);
-  const totalProductsCount = products.reduce((previousProductsCount: number) => previousProductsCount + 1 ,0);
-  const totalProductsPrice = products.reduce((previousProductsPrice: number, currentProductPrice: { price: number; }) =>previousProductsPrice + currentProductPrice.price,1);
+  // const products1 = useSelector((state:RootState) => state.allProducts.products);
+  const products: Array<Product> = useSelector((state:RootStateOrAny) => state.allProducts.products);
+  const totalProductsCount = products.reduce((previousProductsCount) => previousProductsCount + 1 ,0);
+  const totalProductsPrice = products.reduce((previousProductsPrice, currentProductPrice) =>previousProductsPrice + currentProductPrice.price,1);
   const [categoryProducts, setCategoryProducts] = useState(products);
   const [filteredProductsCount, setFilteredProductsCount] = useState(totalProductsCount);
   const [filteredProductsPrice, setfilteredProductsPrice] = useState(totalProductsPrice);
   const productsByCategoryMap = new Map();
-  const categoryList: any[] = [];
+  const categoryList: Array<Category> = [];
 
-  products.forEach((prod: { category: any }) => {
-    if (!categoryList.includes(prod.category)) {
-      categoryList.push(prod.category);
+  products.forEach((product) => {
+    if (!categoryList.includes(product.category)) {
+      categoryList.push(product.category);
     }
   });
 
   categoryList.forEach((category) => {
     productsByCategoryMap.set(
       category,
-      products.filter((prod: { category: string }) => prod.category === category)
+      products.filter((product) => product.category === category)
     );
   });
 
- 
-    const updateByCategory = (categoryName: string) => {
-    const FilterByCategory =productsByCategoryMap.get(categoryName);
+  const updateProductsByCategory = (categoryName: Category) => {
+    const FilterByCategory: Array<Product> = productsByCategoryMap.get(categoryName);
     // const FilterByCategory = products.filter((prod: { category: string }) => prod.category == category);
-    const totalCountByCategory = products.reduce((previousVal: number, product: { category: string; }) => product.category === categoryName ? previousVal + 1 : previousVal,0);
-    const totalPriceByCategory = FilterByCategory.reduce((previousProductPrice: number, currentProductPrice: { price: number; }) =>previousProductPrice + currentProductPrice.price,0);
+    const totalCountByCategory = products.reduce(
+      (previousProductsCount, currentProductCount) =>
+        currentProductCount.category === categoryName
+          ? previousProductsCount + 1
+          : previousProductsCount,
+      0
+    );
+
+    const totalPriceByCategory = FilterByCategory.reduce(
+      (previousProductsPrice, currentProductPrice) =>
+        previousProductsPrice + currentProductPrice.price,
+      0
+    );
 
     setCategoryProducts(FilterByCategory);
     setFilteredProductsCount(totalCountByCategory);
     setfilteredProductsPrice(totalPriceByCategory);
-  }
+  };
 
   const reset = () => {
-    // reset values
     setCategoryProducts(products);
     setfilteredProductsPrice(totalProductsPrice);
     setFilteredProductsCount(totalProductsCount);
   };
 
+  const buttonByCategory =categoryList.map((categoryName, index) => {
+    return (
+      <button key={index} className="bg-red-200 m-2 p-4" onClick={() => updateProductsByCategory(categoryName)}>{categoryName} </button>
+    );
+  })
+
+  const productByCategory = categoryProducts.map((prod) => {
+    return (
+      <ProductCard  product={prod}/>
+    );
+  }
+)
+
   return (
     <>
       <div className="">
-        <button className="bg-red-200 m-2 p-4" onClick={reset}>
-          All
-        </button>
-        {categoryList.map((categoryName) => {
-          return (
-            <button className="bg-red-200 m-2 p-4" onClick={() => updateByCategory(categoryName)}>{categoryName} </button>
-          );
-        })}
+        <button className="bg-red-200 m-2 p-4" onClick={reset}>All</button>
+        {buttonByCategory}
       </div>
-      <div>Total count - {filteredProductsCount}</div>
-      <div>Total Cost is - Rs:{filteredProductsPrice}</div>
+      <div key="total_count">Total count - {filteredProductsCount}</div>
+      <div key="total_cost">Total Cost is - Rs:{filteredProductsPrice}</div>
       <div className="flex flex-wrap justify-center">
-      {categoryProducts.map((cat: {image: string;title:string; price:string}) => {
-            return (
-              <ProductCard category = {cat}/>
-            );
-          }
-      )}
+      {productByCategory}
       </div>
     </>
   );
-
-
-
-
-
 };
 
 export default ProductComponent;

@@ -1,23 +1,20 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
-  products: [{
-    title:"aisa",
-    price:"100",
-    
-  }]
- 
+  products: []
 };
 
-export const productReducer = (state= initialState, { type, payload }) => {
-  switch (type) {
-    case ActionTypes.FETCH_PRODUCTS:
-      return {...state, products:payload};
+export const productReducer = (state= initialState,action:PayloadAction<number>) => {
 
-    case ActionTypes.SET_PRODUCTS:
-      return {...state, products:payload};
+  //action will have type(fetch-produts) and payload(data)
+  switch (action.type) {
+
+    case ActionTypes.FETCH_PRODUCTS:
+      return {...state, products:action.payload};
 
     default:
       return state;
+      
   }
 };

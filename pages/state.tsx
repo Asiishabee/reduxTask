@@ -25,8 +25,8 @@ export default function Persons() {
     })
   );
 
-  const updateByName = (persons) => {
-      console.log(persons, "is name");
+  const updateByName = (persons: { name: any; age?: string; }) => {
+     
   setPersons(persons.name)
   };
   
